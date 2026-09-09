@@ -178,25 +178,21 @@ function applyBranchLayout(tab, settings) {
   tab.setFrozenRows(1);
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setBackground(settings.header).setFontColor(settings.text).setFontWeight('bold');
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setHorizontalAlignment('center');
-  tab.setTabColor(settings.header);
-  tab.setColumnWidths(1, UNIT_HEADERS.length, 130);
-  tab.setColumnWidth(1, 105);
-  tab.setColumnWidth(2, 165);
-  tab.setColumnWidth(3, 155);
-  tab.setColumnWidth(4, 145);
-  tab.setColumnWidth(5, 85);
-  tab.setColumnWidth(6, 175);
-  tab.setColumnWidth(7, 110);
-  tab.setColumnWidth(8, 145);
-  tab.setColumnWidth(9, 165);
-  tab.setColumnWidth(10, 115);
-  tab.setColumnWidth(11, 115);
-  if (tab.getFilter()) tab.getFilter().remove();
-  tab.getRange(1, 1, Math.max(tab.getLastRow(), 2), UNIT_HEADERS.length).createFilter();
-  tab.getRange(2, 7, Math.max(tab.getMaxRows() - 1, 1), 1).setNumberFormat('₱#,##0.00');
-  tab.getRange(2, 10, Math.max(tab.getMaxRows() - 1, 1), 2).setNumberFormat('dd mmm yyyy');
-  tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setVerticalAlignment('middle');
-  tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  try { tab.setTabColor(settings.header); } catch (error) { Logger.log(error); }
+  try {
+    tab.setColumnWidths(1, UNIT_HEADERS.length, 130);
+    [105, 165, 155, 145, 85, 175, 110, 145, 165, 115, 115].forEach((width, index) => tab.setColumnWidth(index + 1, width));
+  } catch (error) { Logger.log(error); }
+  try {
+    if (tab.getFilter()) tab.getFilter().remove();
+    tab.getRange(1, 1, Math.max(tab.getLastRow(), 2), UNIT_HEADERS.length).createFilter();
+  } catch (error) { Logger.log(error); }
+  try { tab.getRange(2, 7, Math.max(tab.getMaxRows() - 1, 1), 1).setNumberFormat('PHP #,##0.00'); } catch (error) { Logger.log(error); }
+  try { tab.getRange(2, 10, Math.max(tab.getMaxRows() - 1, 1), 2).setNumberFormat('dd mmm yyyy'); } catch (error) { Logger.log(error); }
+  try {
+    tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setVerticalAlignment('middle');
+    tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
+  } catch (error) { Logger.log(error); }
 }
 function positionBranchSheet(spreadsheet, branchTab) {
   const branchesSheet = spreadsheet.getSheetByName(SHEETS.branches);
@@ -211,8 +207,10 @@ function positionBranchSheet(spreadsheet, branchTab) {
   const lastBranchIndex = Math.max(branchesSheet.getIndex(), ...managedTabs.map(tab => tab.getIndex()));
   const targetPosition = lastBranchIndex + 1;
   if (branchTab.getIndex() === targetPosition) return;
-  spreadsheet.setActiveSheet(branchTab);
-  spreadsheet.moveActiveSheet(targetPosition);
+  try {
+    spreadsheet.setActiveSheet(branchTab);
+    spreadsheet.moveActiveSheet(Math.min(targetPosition, spreadsheet.getNumSheets()));
+  } catch (error) { Logger.log(error); }
 }
 function branchSettings(branch) {
   const name = String(branch).trim();
