@@ -27,6 +27,10 @@ When using the Apps Script backend before creating your first permanent account,
 6. If old branch tabs remain after deleting their branch rows, select `cleanupOrphanBranchSheets` and click **Run** once. It deletes only tabs using the Unitflow unit-table headers that no longer have an active branch row.
 7. To remove all branch rows and tabs at once, select `deleteAllBranches` and click **Run**. This preserves `Accounts`, `Units`, and `Branches`.
 
+### Spreadsheet access error
+
+If Apps Script reports that it cannot access spreadsheet ID `1kSpF64p6kyRRkEKrd5DrUjmHr1wkyNAkZTG-DlrBHeA`, open the spreadsheet while signed in to the same Google account that owns the Apps Script project. Make sure that account has Editor access to the sheet, run `setupSpreadsheet` once to complete authorization, and redeploy the web app with **Execute as: Me** and **Who has access: Anyone**. If the Apps Script owner is a different account, share the spreadsheet with that account before redeploying.
+
 For production, replace the plain-text password column with salted password hashes and move login to a proper identity provider. Google Apps Script is suitable for a small internal tool, but it should not be treated as a high-security identity system.
 
 Unit statuses are restricted to: `For observation`, `Released`, `For release`, `To be transfered`, and `In warehouse`.
