@@ -3,12 +3,12 @@ const SHEETS = {accounts: 'Accounts', units: 'Units', branches: 'Branches'};
 const UNIT_STATUSES = ['For observation', 'Released', 'For release', 'To be transfered', 'In warehouse'];
 const WAREHOUSE = 'Warehouse';
 const BRANCH_SHEETS = {
-  'BNB Rosales branch': {tab: 'BNB Rosales', header: '#FFD966', text: '#000000'},
-  'BNB Urdaneta branch': {tab: 'BNB Urdaneta', header: '#FFD966', text: '#000000'},
-  'BNB Tayug branch': {tab: 'BNB Tayug', header: '#FFD966', text: '#000000'},
-  'EZ San Carlos branch': {tab: 'EZ San Carlos', header: '#93C47D', text: '#000000'},
-  'EZ San Jose branch': {tab: 'EZ San Jose', header: '#93C47D', text: '#000000'},
-  '1LR Tarlac Branch': {tab: '1LR Tarlac', header: '#000000', text: '#FF0000'}
+  'BNB Rosales': {tab: 'BNB Rosales', header: '#FFD966', text: '#000000'},
+  'BNB Urdaneta': {tab: 'BNB Urdaneta', header: '#FFD966', text: '#000000'},
+  'BNB Tayug': {tab: 'BNB Tayug', header: '#FFD966', text: '#000000'},
+  'EZ San Carlos': {tab: 'EZ San Carlos', header: '#93C47D', text: '#000000'},
+  'EZ San Jose': {tab: 'EZ San Jose', header: '#93C47D', text: '#000000'},
+  '1LR': {tab: '1LR Tarlac', header: '#000000', text: '#FF0000'}
 };
 const UNIT_HEADERS = ['Unit Code', 'Client Name', 'Model', 'Processor', 'RAM', 'Storage Size (HDD/SSD/SD)', 'Unit Price', 'Status', 'Current Location', 'Date Received', 'Released Date'];
 // Temporary bootstrap access. Remove this after creating a permanent technician account.

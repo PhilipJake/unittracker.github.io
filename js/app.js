@@ -1,4 +1,4 @@
-const API_URL = 'https://script.google.com/macros/s/AKfycbxR2kos8Y8O3ziQlM5CPKnHxiAyu5JMpkr033x9tGOnXqJRJlMT6awi-fcFLJRnW_K0/exec'; // Set this to your deployed Google Apps Script web app URL.
+const API_URL = 'https://script.google.com/macros/s/AKfycbwZ412P0eRjaQLoAgk1k4y1je0MH0wvnFA--d3wIXTh0arFFXhiKfds6773lyptikc/exec'; // Set this to your deployed Google Apps Script web app URL.
 const BRANCHES = ['BNB Rosales branch', 'BNB Urdaneta branch', 'BNB Tayug branch', 'EZ San Carlos branch', 'EZ San Jose branch', '1LR Tarlac Branch'];
 const WAREHOUSE = 'Warehouse';
 const demoAccounts = [{name:'Technician', username:'technician', password:'demo123', role:'technician', branch:'All branches'}, {name:'Office coordinator', username:'office', password:'demo123', role:'office', branch:'All branches'}, {name:'Rosales admin', username:'rosales.admin', password:'demo123', role:'admin', branch:'BNB Rosales branch'}];
