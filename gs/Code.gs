@@ -38,7 +38,9 @@ function login(username, password) {
   ensureSheets();
   const rows = sheet(SHEETS.accounts).getDataRange().getValues();
   const headers = rows.shift();
-  const account = rows.map(row => objectFrom(headers, row)).find(item => item.username === username && item.password === password && item.status !== 'Disabled') || (username === TEMP_TECHNICIAN.username && password === TEMP_TECHNICIAN.password ? {...TEMP_TECHNICIAN} : null);
+  const submittedUsername = String(username || '').trim().toLowerCase();
+  const submittedPassword = String(password || '');
+  const account = rows.map(row => objectFrom(headers, row)).find(item => String(item.username || '').trim().toLowerCase() === submittedUsername && String(item.password || '') === submittedPassword && String(item.status || 'Active').trim().toLowerCase() !== 'disabled');
   if (!account) return { ok: false, error: 'Invalid username or password' };
   const token = Utilities.getUuid(); CacheService.getScriptCache().put(token, JSON.stringify(account), 21600);
   delete account.password; return { ok: true, user: account, token: token };
@@ -106,7 +108,13 @@ function ensureSheets() {
     if (!tab) tab = spreadsheet.insertSheet(name);
     if (tab.getLastRow() === 0) tab.getRange(1, 1, 1, definitions[name].length).setValues([definitions[name]]);
   });
+  ensureTemporaryAccount(spreadsheet.getSheetByName(SHEETS.accounts));
   setupBranchSheets(spreadsheet);
+}
+function ensureTemporaryAccount(tab) {
+  const rows = tab.getDataRange().getValues();
+  const hasTemporaryAccount = rows.slice(1).some(row => String(row[1] || '').trim().toLowerCase() === TEMP_TECHNICIAN.username);
+  if (!hasTemporaryAccount) tab.appendRow([TEMP_TECHNICIAN.name, TEMP_TECHNICIAN.username, TEMP_TECHNICIAN.password, TEMP_TECHNICIAN.role, TEMP_TECHNICIAN.branch, TEMP_TECHNICIAN.status]);
 }
 function setupSpreadsheet() { ensureSheets(); syncBranchSheets(); }
 function setupBranchSheets(spreadsheet) {

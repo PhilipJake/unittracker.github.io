@@ -4,7 +4,7 @@ Static client unit tracker UI backed by the supplied Google Sheet through Google
 
 ## Run the interface
 
-Open `index.html` in a browser. The UI starts in local demo mode so the workflow can be reviewed without credentials or an API URL.
+Open `index.html` in a browser. When `API_URL` is configured, the login page validates credentials against the `Accounts` sheet through Google Apps Script. If `API_URL` is blank, the UI runs in local demo mode.
 
 Demo accounts all use password `demo123`:
 
@@ -12,7 +12,7 @@ Demo accounts all use password `demo123`:
 - `office`: all branches and unit data
 - `rosales.admin`: BNB Rosales branch only
 
-When using the Apps Script backend before creating your first permanent account, temporarily sign in with username `temp.technician` and password `UnitflowTemp2026!`. Use it to create a permanent technician account, then remove `TEMP_TECHNICIAN` from `gs/Code.gs` and redeploy the web app.
+When using the Apps Script backend before creating your first permanent account, the script automatically adds a temporary row to the `Accounts` sheet. Sign in with username `temp.technician` and password `UnitflowTemp2026!`. Use it to create a permanent technician account, then remove `TEMP_TECHNICIAN` and `ensureTemporaryAccount` from `gs/Code.gs` and redeploy the web app.
 
 ## Connect Google Sheets
 
