@@ -28,6 +28,7 @@ function doPost(event) {
     if (request.action === 'updateUnit') { requireRole(user, ['technician', 'office', 'admin']); return json({ ok: true, data: updateUnit(request, user) }); }
     if (request.action === 'deleteUnit') { requireRole(user, ['technician']); return json({ ok: true, data: deleteUnit(request.unitCode) }); }
     if (request.action === 'createAccount') { requireRole(user, ['technician']); return json({ ok: true, data: createAccount(request) }); }
+    if (request.action === 'deleteAccount') { requireRole(user, ['technician']); return json({ ok: true, data: deleteAccount(request.username, user) }); }
     if (request.action === 'createBranch') { requireRole(user, ['technician', 'office']); return json({ ok: true, data: createBranch(request.name) }); }
     if (request.action === 'deleteBranch') { requireRole(user, ['technician']); return json({ ok: true, data: deleteBranch(request.name) }); }
     return json({ ok: false, error: 'Unknown action' });
@@ -71,6 +72,15 @@ function updateUnit(request, user) {
   return request;
 }
 function createAccount(request) { sheet(SHEETS.accounts).appendRow([request.name, request.username, request.password, request.role, request.branch || 'All branches', 'Active']); return request.username; }
+function deleteAccount(username, user) {
+  if (String(username).trim().toLowerCase() === String(user.username).trim().toLowerCase()) throw new Error('You cannot delete your current account');
+  const tab = sheet(SHEETS.accounts);
+  const values = tab.getDataRange().getValues();
+  const rowIndex = values.findIndex((row, index) => index > 0 && String(row[1]).trim().toLowerCase() === String(username).trim().toLowerCase());
+  if (rowIndex < 1) throw new Error('Account not found');
+  tab.deleteRow(rowIndex + 1);
+  return username;
+}
 function createBranch(name) {
   sheet(SHEETS.branches).appendRow([name, new Date()]);
   createBranchSheet(SpreadsheetApp.openById(SPREADSHEET_ID), name);
