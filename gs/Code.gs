@@ -2,6 +2,8 @@ const SPREADSHEET_ID = '1kSpF64p6kyRRkEKrd5DrUjmHr1wkyNAkZTG-DlrBHeA';
 const SHEETS = {accounts: 'Accounts', units: 'Units', branches: 'Branches'};
 const UNIT_STATUSES = ['For observation', 'Released', 'For release', 'To be transfered', 'In warehouse'];
 const WAREHOUSE = 'Warehouse';
+// Temporary bootstrap access. Remove this after creating a permanent technician account.
+const TEMP_TECHNICIAN = {name: 'Temporary Technician', username: 'temp.technician', password: 'UnitflowTemp2026!', role: 'technician', branch: 'All branches', status: 'Active'};
 
 function doGet() { return json({ ok: true, service: 'unitflow' }); }
 
@@ -25,7 +27,7 @@ function doPost(event) {
 function login(username, password) {
   const rows = sheet(SHEETS.accounts).getDataRange().getValues();
   const headers = rows.shift();
-  const account = rows.map(row => objectFrom(headers, row)).find(item => item.username === username && item.password === password && item.status !== 'Disabled');
+  const account = rows.map(row => objectFrom(headers, row)).find(item => item.username === username && item.password === password && item.status !== 'Disabled') || (username === TEMP_TECHNICIAN.username && password === TEMP_TECHNICIAN.password ? {...TEMP_TECHNICIAN} : null);
   if (!account) return { ok: false, error: 'Invalid username or password' };
   const token = Utilities.getUuid(); CacheService.getScriptCache().put(token, JSON.stringify(account), 21600);
   delete account.password; return { ok: true, user: account, token: token };

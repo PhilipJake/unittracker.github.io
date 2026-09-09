@@ -12,6 +12,8 @@ Demo accounts all use password `demo123`:
 - `office`: all branches and unit data
 - `rosales.admin`: BNB Rosales branch only
 
+When using the Apps Script backend before creating your first permanent account, temporarily sign in with username `temp.technician` and password `UnitflowTemp2026!`. Use it to create a permanent technician account, then remove `TEMP_TECHNICIAN` from `gs/Code.gs` and redeploy the web app.
+
 ## Connect Google Sheets
 
 1. In the supplied spreadsheet, create sheets named `Accounts`, `Units`, and `Branches`.
