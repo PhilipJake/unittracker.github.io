@@ -169,8 +169,11 @@ function setupBranchSheets(spreadsheet) {
 function createBranchSheet(spreadsheet, branch) {
   const settings = BRANCH_SHEETS[branch] || branchSettings(branch);
   let tab = spreadsheet.getSheetByName(settings.tab);
-  if (!tab) tab = spreadsheet.insertSheet(settings.tab);
-  positionBranchSheet(spreadsheet, tab);
+  if (!tab) {
+    const branchesSheet = spreadsheet.getSheetByName(SHEETS.branches);
+    const insertPosition = branchesSheet ? Math.min(branchesSheet.getIndex() + 1, spreadsheet.getNumSheets() + 1) : spreadsheet.getNumSheets() + 1;
+    tab = spreadsheet.insertSheet(settings.tab, insertPosition);
+  }
   applyBranchLayout(tab, settings);
 }
 function applyBranchLayout(tab, settings) {
@@ -192,24 +195,6 @@ function applyBranchLayout(tab, settings) {
   try {
     tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setVerticalAlignment('middle');
     tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
-  } catch (error) { Logger.log(error); }
-}
-function positionBranchSheet(spreadsheet, branchTab) {
-  const branchesSheet = spreadsheet.getSheetByName(SHEETS.branches);
-  if (!branchesSheet || branchTab.getName() === SHEETS.branches) return;
-  const branchRows = branchesSheet.getDataRange().getValues().slice(1);
-  const branchTabNames = new Set(branchRows.map(row => {
-    const branch = String(row[0]).trim();
-    return (BRANCH_SHEETS[branch] || branchSettings(branch)).tab;
-  }).filter(Boolean));
-  branchTabNames.add(branchTab.getName());
-  const managedTabs = spreadsheet.getSheets().filter(tab => branchTabNames.has(tab.getName()) && tab.getName() !== branchTab.getName());
-  const lastBranchIndex = Math.max(branchesSheet.getIndex(), ...managedTabs.map(tab => tab.getIndex()));
-  const targetPosition = lastBranchIndex + 1;
-  if (branchTab.getIndex() === targetPosition) return;
-  try {
-    spreadsheet.setActiveSheet(branchTab);
-    spreadsheet.moveActiveSheet(Math.min(targetPosition, spreadsheet.getNumSheets()));
   } catch (error) { Logger.log(error); }
 }
 function branchSettings(branch) {
