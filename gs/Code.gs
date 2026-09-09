@@ -144,6 +144,19 @@ function initializeDefaultBranches() {
   Object.keys(BRANCH_SHEETS).forEach(branch => tab.appendRow([branch, new Date()]));
   syncBranchSheets();
 }
+function deleteAllBranches() {
+  ensureSheets();
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const branchesTab = sheet(SHEETS.branches);
+  const branchNames = branchesTab.getDataRange().getValues().slice(1).map(row => String(row[0]).trim()).filter(Boolean);
+  const tabNames = new Set([...Object.keys(BRANCH_SHEETS).map(branch => BRANCH_SHEETS[branch].tab), ...branchNames.map(branch => (BRANCH_SHEETS[branch] || branchSettings(branch)).tab)]);
+  if (branchesTab.getLastRow() > 1) branchesTab.deleteRows(2, branchesTab.getLastRow() - 1);
+  tabNames.forEach(name => {
+    const tab = spreadsheet.getSheetByName(name);
+    if (tab) spreadsheet.deleteSheet(tab);
+  });
+  cleanupOrphanBranchSheets();
+}
 function setupBranchSheets(spreadsheet) {
   const branches = sheet(SHEETS.branches).getDataRange().getValues().slice(1).map(row => String(row[0]).trim()).filter(Boolean);
   branches.forEach(branch => createBranchSheet(spreadsheet, branch));

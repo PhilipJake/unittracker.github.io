@@ -25,6 +25,7 @@ When using the Apps Script backend before creating your first permanent account,
 4. Put the deployed web app URL into `API_URL` at the top of `js/app.js`.
 5. In Apps Script, select `initializeDefaultBranches` from the function menu and click **Run** once to create the six starting branch rows and tabs. Branch tabs are synchronized automatically when branches or units are created, edited, or deleted.
 6. If old branch tabs remain after deleting their branch rows, select `cleanupOrphanBranchSheets` and click **Run** once. It deletes only tabs using the Unitflow unit-table headers that no longer have an active branch row.
+7. To remove all six original branches and their tabs at once, select `deleteAllBranches` and click **Run**. This preserves `Accounts`, `Units`, and `Branches`.
 
 For production, replace the plain-text password column with salted password hashes and move login to a proper identity provider. Google Apps Script is suitable for a small internal tool, but it should not be treated as a high-security identity system.
 
