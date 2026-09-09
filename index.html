@@ -19,8 +19,46 @@
 </head>
 <body>
   <section class="login-screen" id="loginScreen">
-    <div class="login-art"><div class="login-brand"><span class="brand-mark">U</span><span>unitflow</span></div><div class="login-art-copy"><p class="eyebrow">Client unit operations</p><h1>Know every unit.<br><em>Move work forward.</em></h1><p>One calm, shared view of your branches, clients, and service activity.</p></div><div class="login-art-foot"><span>Secure workspace</span><span>·</span><span>Google Sheets connected</span></div></div>
-    <div class="login-form-side"><div class="login-form-wrap"><p class="eyebrow">Welcome back</p><h2>Sign in to your workspace</h2><p class="login-copy">Use your Unitflow account to continue.</p><form id="loginForm"><label>Username<input name="username" autocomplete="username" required placeholder="Enter your username"></label><label>Password<div class="password-field"><input name="password" type="password" autocomplete="current-password" required placeholder="Enter your password"><button type="button" id="togglePassword" aria-label="Show password">Show</button></div></label><button class="primary-button login-submit" type="submit">Continue <span>→</span></button><p class="login-error" id="loginError"></p></form><div class="demo-hint"><strong>Preview access</strong><span>technician · demo123</span><span>office · demo123</span><span>rosales.admin · demo123</span></div></div><div class="login-footer">Unitflow · Internal operations tool</div></div>
+    <div class="login-art"><div class="login-brand">
+      <span class="brand-mark">U</span>
+      <span>unitflow</span>
+    </div>
+    <div class="login-art-copy">
+      <p class="eyebrow">Client unit operations</p>
+      <h1>Know every unit.<br><em>Move work forward.</em></h1>
+      <p>One calm, shared view of your branches, clients, and service activity.</p>
+    </div>
+    <div class="login-art-foot">
+      <span>Secure workspace</span>
+      <span>·</span>
+      <span>Google Sheets connected</span>
+    </div>
+  </div>
+    <div class="login-form-side">
+      <div class="login-form-wrap">
+        <p class="eyebrow">Welcome back</p>
+        <h2>Sign in to your workspace</h2>
+        <p class="login-copy">Use your Unitflow account to continue.</p>
+        <form id="loginForm">
+          <label>Username<input name="username" autocomplete="username" required placeholder="Enter your username"></label>
+          <label>Password
+            <div class="password-field">
+              <input name="password" type="password" autocomplete="current-password" required placeholder="Enter your password">
+              <button type="button" id="togglePassword" aria-label="Show password">Show</button>
+            </div>
+          </label>
+          <button class="primary-button login-submit" type="submit">Continue <span>→</span></button>
+          <p class="login-error" id="loginError"></p>
+        </form>
+        <div class="demo-hint">
+          <strong>Preview access</strong>
+          <span>technician · demo123</span>
+          <span>office · demo123</span>
+          <span>rosales.admin · demo123</span>
+        </div>
+      </div>
+      <div class="login-footer">Unitflow · Internal operations tool</div>
+    </div>
   </section>
   <div class="app-shell">
     <aside class="sidebar" aria-label="Main navigation">
@@ -36,7 +74,13 @@
         <a class="nav-link" href="#accounts" data-view="accounts" data-management-view><span class="nav-icon">◎</span>Accounts</a>
       </nav>
       <div class="sidebar-footer">
-        <div class="sync-status"><span class="status-dot"></span><span><strong>Google Sheets</strong><small>Connected database</small></span></div>
+        <div class="sync-status">
+          <span class="status-dot"></span>
+          <span>
+            <strong>Google Sheets</strong>
+            <small>Connected database</small>
+          </span>
+        </div>
         <button class="logout-button" id="logoutButton">Sign out <span>↗</span></button>
       </div>
     </aside>
@@ -49,24 +93,182 @@
       </header>
 
       <section class="page-view" id="dashboardView">
-        <div class="page-heading"><div><p class="eyebrow">Wednesday, September 9, 2026</p><h1>Good morning, <span id="headingName">Technician</span>.</h1><p class="heading-copy">Here’s what’s moving across your client units today.</p></div><button class="primary-button" id="newUnitButton"><span>＋</span> Register unit</button></div>
+        <div class="page-heading"><div><p class="eyebrow">Wednesday, September 9, 2026</p>
+          <h1>Good morning, 
+            <span id="headingName">Technician</span>.
+          </h1>
+          <p class="heading-copy">Here’s what’s moving across your client units today.</p>
+        </div>
+        <button class="primary-button" id="newUnitButton">
+          <span>＋</span> Register unit</button></div>
         <div class="stats-grid">
-          <article class="stat-card stat-dark"><div class="stat-top"><span>Total units</span><span class="stat-symbol">▦</span></div><strong id="totalUnits">0</strong><div class="stat-foot"><span class="trend-up">↗ 8.4%</span> from last month</div></article>
-          <article class="stat-card"><div class="stat-top"><span>Active tracking</span><span class="stat-symbol green">◉</span></div><strong id="activeUnits">0</strong><div class="stat-foot">Currently in service</div></article>
-          <article class="stat-card"><div class="stat-top"><span>Needs attention</span><span class="stat-symbol amber">!</span></div><strong id="attentionUnits">0</strong><div class="stat-foot">Due for an update</div></article>
-          <article class="stat-card"><div class="stat-top"><span>Branches</span><span class="stat-symbol blue">⌘</span></div><strong id="branchCount">6</strong><div class="stat-foot">Across your workspace</div></article>
+          <article class="stat-card stat-dark">
+            <div class="stat-top">
+              <span>Total units</span>
+              <span class="stat-symbol">▦</span>
+            </div>
+            <strong id="totalUnits">0</strong>
+            <div class="stat-foot">
+              <span class="trend-up">↗ 8.4%</span> from last month
+            </div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Active tracking</span>
+              <span class="stat-symbol green">◉</span>
+            </div>
+            <strong id="activeUnits">0</strong>
+            <div class="stat-foot">Currently in service</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Needs attention</span>
+              <span class="stat-symbol amber">!</span>
+            </div>
+            <strong id="attentionUnits">0</strong>
+            <div class="stat-foot">Due for an update</div>
+          </article>
+          <article class="stat-card">
+            <div class="stat-top">
+              <span>Branches</span>
+              <span class="stat-symbol blue">⌘</span>
+            </div>
+            <strong id="branchCount">6</strong>
+            <div class="stat-foot">Across your workspace</div>
+          </article>
         </div>
         <div class="content-grid">
-          <section class="panel recent-panel"><div class="panel-heading"><div><h2>Recent unit activity</h2><p>Latest changes from your branches</p></div><a href="#units" data-view="units" class="text-link">View all <span>→</span></a></div><div class="table-wrap"><table><thead><tr><th>Unit code</th><th>Client name</th><th>Model</th><th>Unit price</th><th>Status</th><th>Current location</th><th>Date received</th><th>Released date</th></tr></thead><tbody id="recentUnits"></tbody></table></div></section>
-          <section class="panel branch-panel"><div class="panel-heading"><div><h2>Branch pulse</h2><p>Units by location</p></div><a href="#branches" data-view="branches" class="text-link">Manage <span>→</span></a></div><div class="branch-list" id="branchPulse"></div></section>
+          <section class="panel recent-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Recent unit activity</h2>
+                <p>Latest changes from your branches</p>
+              </div>
+              <a href="#units" data-view="units" class="text-link">View all <span>→</span></a>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Unit code</th>
+                    <th>Client name</th>
+                    <th>Model</th>
+                    <th>Unit price</th>
+                    <th>Status</th>
+                    <th>Current location</th>
+                    <th>Date received</th>
+                    <th>Released date</th>
+                  </tr>
+                </thead>
+                <tbody id="recentUnits"></tbody>
+              </table>
+            </div>
+          </section>
+          <section class="panel branch-panel">
+            <div class="panel-heading">
+              <div>
+                <h2>Branch pulse</h2>
+                <p>Units by location</p>
+              </div>
+              <a href="#branches" data-view="branches" class="text-link">Manage <span>→</span></a>
+            </div>
+            <div class="branch-list" id="branchPulse"></div>
+          </section>
         </div>
       </section>
 
-      <section class="page-view hidden" id="unitsView"><div class="page-heading compact"><div><p class="eyebrow">Registry</p><h1>Unit registry</h1><p class="heading-copy">Search, update, and keep every client unit accounted for.</p></div><button class="primary-button" id="newUnitButtonSecondary"><span>＋</span> Register unit</button></div><section class="panel"><div class="toolbar"><label class="search-field"><span>⌕</span><input id="unitSearch" type="search" placeholder="Search units, clients, models, or branches"></label><select id="statusFilter" aria-label="Filter by status"><option value="all">All statuses</option><option value="For observation">For observation</option><option value="Released">Released</option><option value="For release">For release</option><option value="To be transfered">To be transfered</option><option value="In warehouse">In warehouse</option></select></div><div class="table-wrap"><table><thead><tr><th>Unit code</th><th>Client name</th><th>Model</th><th>Processor</th><th>RAM</th><th>Storage size</th><th>Unit price</th><th>Status</th><th>Current location</th><th>Date received</th><th>Released date</th><th></th></tr></thead><tbody id="allUnits"></tbody></table></div></section></section>
+      <section class="page-view hidden" id="unitsView">
+        <div class="page-heading compact">
+          <div>
+            <p class="eyebrow">Registry</p>
+            <h1>Unit registry</h1>
+            <p class="heading-copy">Search, update, and keep every client unit accounted for.</p>
+          </div>
+          <button class="primary-button" id="newUnitButtonSecondary">
+            <span>＋</span> Register unit
+          </button>
+        </div>
+        <section class="panel">
+          <div class="toolbar">
+            <label class="search-field">
+              <span>⌕</span>
+              <input id="unitSearch" type="search" placeholder="Search units, clients, models, or branches"></label>
+              <select id="statusFilter" aria-label="Filter by status">
+                <option value="all">All statuses</option>
+                <option value="For observation">For observation</option>
+                <option value="Released">Released</option>
+                <option value="For release">For release</option>
+                <option value="To be transfered">To be transfered</option>
+                <option value="In warehouse">In warehouse</option>
+              </select>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Unit code</th>
+                    <th>Client name</th>
+                    <th>Model</th>
+                    <th>Processor</th>
+                    <th>RAM</th>
+                    <th>Storage size</th>
+                    <th>Unit price</th>
+                    <th>Status</th>
+                    <th>Current location</th>
+                    <th>Date received</th>
+                    <th>Released date</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="allUnits"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
 
-      <section class="page-view hidden" id="branchesView"><div class="page-heading compact"><div><p class="eyebrow">Workspace structure</p><h1>Branches</h1><p class="heading-copy">A clear view of every location in your network.</p></div><button class="primary-button" id="addBranchButton"><span>＋</span> Add branch</button></div><div class="branch-cards" id="branchCards"></div></section>
+      <section class="page-view hidden" id="branchesView">
+        <div class="page-heading compact">
+          <div>
+            <p class="eyebrow">Workspace structure</p>
+            <h1>Branches</h1>
+            <p class="heading-copy">A clear view of every location in your network.</p>
+          </div>
+          <button class="primary-button" id="addBranchButton">
+            <span>＋</span> Add branch
+          </button>
+        </div>
+        <div class="branch-cards" id="branchCards"></div>
+      </section>
 
-      <section class="page-view hidden" id="accountsView"><div class="page-heading compact"><div><p class="eyebrow">Access control</p><h1>Accounts</h1><p class="heading-copy">Manage who can see and change your unit data.</p></div><button class="primary-button" id="addAccountButton"><span>＋</span> Add account</button></div><section class="panel"><div class="table-wrap"><table><thead><tr><th>Name</th><th>Username</th><th>Role</th><th>Branch access</th><th>Status</th><th></th></tr></thead><tbody id="accountsTable"></tbody></table></div></section></section>
+      <section class="page-view hidden" id="accountsView">
+        <div class="page-heading compact">
+          <div>
+            <p class="eyebrow">Access control</p>
+            <h1>Accounts</h1>
+            <p class="heading-copy">Manage who can see and change your unit data.</p>
+          </div>
+          <button class="primary-button" id="addAccountButton">
+            <span>＋</span> Add account
+          </button>
+        </div>
+        <section class="panel">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Username</th>
+                  <th>Role</th>
+                  <th>Branch access</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="accountsTable"></tbody>
+            </table>
+          </div>
+        </section>
+      </section>
     </main>
   </div>
 
