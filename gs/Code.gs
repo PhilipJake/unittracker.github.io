@@ -88,7 +88,7 @@ function createBranch(name) {
   const branchesTab = sheet(SHEETS.branches);
   const existing = branchesTab.getDataRange().getValues().slice(1).some(row => {
     const existingName = String(row[0] || '').trim();
-    return existingName && normalizeBranchName(existingName).toLowerCase() === branchName.toLowerCase();
+    return existingName && branchKey(existingName) === branchKey(branchName);
   });
   if (existing) throw new Error('Branch already exists and is active');
   branchesTab.appendRow([branchName, new Date()]);
@@ -109,9 +109,9 @@ function normalizeBranchName(name) {
   let branchName = String(name || '').trim().replace(/\s+/g, ' ');
   if (!branchName) throw new Error('Branch name is required');
   branchName = branchName.replace(/^(bnb|ez|1lr)\b/i, match => match.toUpperCase());
-  if (/^(BNB|EZ|1LR)\b/i.test(branchName) && !/\bbranch$/i.test(branchName)) return branchName + ' branch';
   return branchName;
 }
+function branchKey(name) { return normalizeBranchName(name).replace(/\s+branch$/i, '').toLowerCase(); }
 function deleteUnit(unitCode) {
   const tab = sheet(SHEETS.units);
   const values = tab.getDataRange().getValues();
