@@ -85,16 +85,20 @@ function createBranch(name) {
   const branchName = normalizeBranchName(name);
   if (!branchName) throw new Error('Branch name is required');
   const branchesTab = sheet(SHEETS.branches);
-  const existing = branchesTab.getDataRange().getValues().slice(1).some(row => String(row[0]).trim().toLowerCase() === branchName.toLowerCase());
-  if (existing) throw new Error('Branch already exists');
+  const existing = branchesTab.getDataRange().getValues().slice(1).some(row => {
+    const existingName = String(row[0] || '').trim();
+    return existingName && normalizeBranchName(existingName).toLowerCase() === branchName.toLowerCase();
+  });
+  if (existing) throw new Error('Branch already exists and is active');
   branchesTab.appendRow([branchName, new Date()]);
   createBranchSheet(SpreadsheetApp.openById(SPREADSHEET_ID), branchName);
   syncBranchSheets();
   return branchName;
 }
 function normalizeBranchName(name) {
-  const branchName = String(name || '').trim().replace(/\s+/g, ' ');
+  let branchName = String(name || '').trim().replace(/\s+/g, ' ');
   if (!branchName) throw new Error('Branch name is required');
+  branchName = branchName.replace(/^(bnb|ez|1lr)\b/i, match => match.toUpperCase());
   if (/^(BNB|EZ|1LR)\b/i.test(branchName) && !/\bbranch$/i.test(branchName)) return branchName + ' branch';
   return branchName;
 }
