@@ -1,4 +1,5 @@
 const SPREADSHEET_ID = '1kSpF64p6kyRRkEKrd5DrUjmHr1wkyNAkZTG-DlrBHeA';
+const SPREADSHEET_URL = 'https://docs.google.com/spreadsheets/d/1kSpF64p6kyRRkEKrd5DrUjmHr1wkyNAkZTG-DlrBHeA/edit';
 const SHEETS = {accounts: 'Accounts', units: 'Units', branches: 'Branches'};
 const UNIT_STATUSES = ['For observation', 'Released', 'For release', 'To be transfered', 'In warehouse'];
 const WAREHOUSE = 'Warehouse';
@@ -14,12 +15,11 @@ const UNIT_HEADERS = ['Unit Code', 'Client Name', 'Model', 'Processor', 'RAM', '
 // Temporary bootstrap access. Remove this after creating a permanent technician account.
 const TEMP_TECHNICIAN = {name: 'Temporary Technician', username: 'temp.technician', password: 'UnitflowTemp2026!', role: 'technician', branch: 'All branches', status: 'Active'};
 
-function doGet() { ensureSheets(); return json({ ok: true, service: 'unitflow' }); }
+function doGet() { return json({ ok: true, service: 'unitflow' }); }
 
 function doPost(event) {
   try {
     const request = JSON.parse(event.postData.contents);
-    ensureSheets();
     if (request.action === 'login') return json(login(request.username, request.password));
     const user = authenticate(request.token);
     if (!user) return json({ ok: false, error: 'Unauthorized' });
@@ -37,7 +37,6 @@ function doPost(event) {
 }
 
 function login(username, password) {
-  ensureSheets();
   const rows = sheet(SHEETS.accounts).getDataRange().getValues();
   const headers = rows.shift();
   const submittedUsername = String(username || '').trim().toLowerCase();
@@ -93,7 +92,7 @@ function createBranch(name) {
   });
   if (existing) throw new Error('Branch already exists and is active');
   branchesTab.appendRow([branchName, new Date()]);
-  createBranchSheet(SpreadsheetApp.openById(SPREADSHEET_ID), branchName);
+  createBranchSheet(getSpreadsheet(), branchName);
   syncBranchSheets();
   return branchName;
 }
@@ -120,7 +119,7 @@ function deleteBranch(name) {
   const rowIndex = values.findIndex((row, index) => index > 0 && String(row[0]).trim().toLowerCase() === branchName.toLowerCase());
   if (rowIndex < 1) throw new Error('Branch not found');
   tab.deleteRow(rowIndex + 1);
-  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const spreadsheet = getSpreadsheet();
   const branchTab = spreadsheet.getSheetByName((BRANCH_SHEETS[branchName] || branchSettings(branchName)).tab);
   if (branchTab) spreadsheet.deleteSheet(branchTab);
   return branchName;
@@ -129,7 +128,7 @@ function adminLocations(user) { return [...new Set([user.branch, 'BNB Rosales br
 function authenticate(token) { const raw = CacheService.getScriptCache().get(token); return raw ? JSON.parse(raw) : null; }
 function requireRole(user, roles) { if (roles.indexOf(user.role) === -1) throw new Error('Insufficient permissions'); }
 function ensureSheets() {
-  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const spreadsheet = getSpreadsheet();
   const definitions = {
     Accounts: ['name', 'username', 'password', 'role', 'branch', 'status'],
     Units: UNIT_HEADERS,
@@ -149,9 +148,13 @@ function ensureTemporaryAccount(tab) {
   if (!hasTemporaryAccount) tab.appendRow([TEMP_TECHNICIAN.name, TEMP_TECHNICIAN.username, TEMP_TECHNICIAN.password, TEMP_TECHNICIAN.role, TEMP_TECHNICIAN.branch, TEMP_TECHNICIAN.status]);
 }
 function setupSpreadsheet() { ensureSheets(); syncBranchSheets(); }
+function authorizeSpreadsheet() {
+  const spreadsheet = SpreadsheetApp.openByUrl(SPREADSHEET_URL);
+  Logger.log('Authorized spreadsheet: ' + spreadsheet.getName());
+}
 function deleteAllBranches() {
   ensureSheets();
-  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const spreadsheet = getSpreadsheet();
   const branchesTab = sheet(SHEETS.branches);
   const branchNames = branchesTab.getDataRange().getValues().slice(1).map(row => String(row[0]).trim()).filter(Boolean);
   const tabNames = new Set([...Object.keys(BRANCH_SHEETS).map(branch => BRANCH_SHEETS[branch].tab), ...branchNames.map(branch => (BRANCH_SHEETS[branch] || branchSettings(branch)).tab)]);
@@ -205,7 +208,7 @@ function branchSettings(branch) {
   return {tab: name.substring(0, 90), header: '#D9EAD3', text: '#000000'};
 }
 function syncBranchSheets() {
-  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const spreadsheet = getSpreadsheet();
   setupBranchSheets(spreadsheet);
   const master = sheet(SHEETS.units);
   const values = master.getDataRange().getValues();
@@ -224,7 +227,7 @@ function syncBranchSheets() {
   });
 }
 function cleanupOrphanBranchSheets() {
-  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const spreadsheet = getSpreadsheet();
   const activeTabs = new Set(sheet(SHEETS.branches).getDataRange().getValues().slice(1).map(row => {
     const branch = String(row[0]).trim();
     return (BRANCH_SHEETS[branch] || branchSettings(branch)).tab;
@@ -235,7 +238,11 @@ function cleanupOrphanBranchSheets() {
     if (header.join('|') === UNIT_HEADERS.join('|') && !activeTabs.has(tab.getName())) spreadsheet.deleteSheet(tab);
   });
 }
-function sheet(name) { return SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(name); }
+function getSpreadsheet() {
+  const active = SpreadsheetApp.getActiveSpreadsheet();
+  return active || SpreadsheetApp.openById(SPREADSHEET_ID);
+}
+function sheet(name) { return getSpreadsheet().getSheetByName(name); }
 function objectFrom(headers, row) {
   return headers.reduce((object, header, index) => {
     const key = String(header).toLowerCase().trim();
