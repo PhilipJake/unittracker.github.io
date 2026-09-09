@@ -24,6 +24,7 @@ function doPost(event) {
     const user = authenticate(request.token);
     if (!user) return json({ ok: false, error: 'Unauthorized' });
     if (request.action === 'list') return json({ ok: true, data: listUnits(user) });
+    if (request.action === 'listBranches') return json({ ok: true, data: listBranches() });
     if (request.action === 'createUnit') { requireRole(user, ['technician', 'office', 'admin']); return json({ ok: true, data: createUnit(request, user) }); }
     if (request.action === 'updateUnit') { requireRole(user, ['technician', 'office', 'admin']); return json({ ok: true, data: updateUnit(request, user) }); }
     if (request.action === 'deleteUnit') { requireRole(user, ['technician']); return json({ ok: true, data: deleteUnit(request.unitCode) }); }
@@ -48,6 +49,7 @@ function login(username, password) {
 }
 
 function listUnits(user) { const values = sheet(SHEETS.units).getDataRange().getValues(); const headers = values.shift(); return values.map(row => objectFrom(headers, row)).filter(unit => user.role !== 'admin' || adminLocations(user).indexOf(unit.currentLocation) !== -1); }
+function listBranches() { return sheet(SHEETS.branches).getDataRange().getValues().slice(1).map(row => String(row[0]).trim()).filter(Boolean); }
 function createUnit(request, user) {
   if (UNIT_STATUSES.indexOf(request.status) === -1) throw new Error('Invalid unit status');
   if (user.role === 'admin' && adminLocations(user).indexOf(request.currentLocation) === -1) throw new Error('Admins can only add units to their assigned branch, BNB Rosales branch, or Warehouse');
@@ -169,11 +171,32 @@ function createBranchSheet(spreadsheet, branch) {
   let tab = spreadsheet.getSheetByName(settings.tab);
   if (!tab) tab = spreadsheet.insertSheet(settings.tab);
   positionBranchSheet(spreadsheet, tab);
+  applyBranchLayout(tab, settings);
+}
+function applyBranchLayout(tab, settings) {
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setValues([UNIT_HEADERS]);
   tab.setFrozenRows(1);
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setBackground(settings.header).setFontColor(settings.text).setFontWeight('bold');
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setHorizontalAlignment('center');
-  tab.autoResizeColumns(1, UNIT_HEADERS.length);
+  tab.setTabColor(settings.header);
+  tab.setColumnWidths(1, UNIT_HEADERS.length, 130);
+  tab.setColumnWidth(1, 105);
+  tab.setColumnWidth(2, 165);
+  tab.setColumnWidth(3, 155);
+  tab.setColumnWidth(4, 145);
+  tab.setColumnWidth(5, 85);
+  tab.setColumnWidth(6, 175);
+  tab.setColumnWidth(7, 110);
+  tab.setColumnWidth(8, 145);
+  tab.setColumnWidth(9, 165);
+  tab.setColumnWidth(10, 115);
+  tab.setColumnWidth(11, 115);
+  if (tab.getFilter()) tab.getFilter().remove();
+  tab.getRange(1, 1, Math.max(tab.getLastRow(), 2), UNIT_HEADERS.length).createFilter();
+  tab.getRange(2, 7, Math.max(tab.getMaxRows() - 1, 1), 1).setNumberFormat('₱#,##0.00');
+  tab.getRange(2, 10, Math.max(tab.getMaxRows() - 1, 1), 2).setNumberFormat('dd mmm yyyy');
+  tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setVerticalAlignment('middle');
+  tab.getRange(1, 1, Math.max(tab.getMaxRows(), 2), UNIT_HEADERS.length).setWrapStrategy(SpreadsheetApp.WrapStrategy.CLIP);
 }
 function positionBranchSheet(spreadsheet, branchTab) {
   const branchesSheet = spreadsheet.getSheetByName(SHEETS.branches);
@@ -214,7 +237,7 @@ function syncBranchSheets() {
     const rowCount = Math.max(tab.getLastRow() - 1, 0);
     if (rowCount) tab.getRange(2, 1, rowCount, UNIT_HEADERS.length).clearContent();
     if (rows.length) tab.getRange(2, 1, rows.length, UNIT_HEADERS.length).setValues(rows);
-    tab.getRange(1, 1, 1, UNIT_HEADERS.length).setBackground(settings.header).setFontColor(settings.text).setFontWeight('bold');
+    applyBranchLayout(tab, settings);
   });
 }
 function cleanupOrphanBranchSheets() {
