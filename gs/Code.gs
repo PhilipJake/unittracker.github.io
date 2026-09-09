@@ -111,7 +111,6 @@ function deleteBranch(name) {
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   const branchTab = spreadsheet.getSheetByName((BRANCH_SHEETS[branchName] || branchSettings(branchName)).tab);
   if (branchTab) spreadsheet.deleteSheet(branchTab);
-  cleanupOrphanBranchSheets();
   return branchName;
 }
 function adminLocations(user) { return [...new Set([user.branch, 'BNB Rosales branch', WAREHOUSE])]; }
