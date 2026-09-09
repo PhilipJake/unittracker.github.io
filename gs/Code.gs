@@ -137,13 +137,6 @@ function ensureTemporaryAccount(tab) {
   if (!hasTemporaryAccount) tab.appendRow([TEMP_TECHNICIAN.name, TEMP_TECHNICIAN.username, TEMP_TECHNICIAN.password, TEMP_TECHNICIAN.role, TEMP_TECHNICIAN.branch, TEMP_TECHNICIAN.status]);
 }
 function setupSpreadsheet() { ensureSheets(); syncBranchSheets(); }
-function initializeDefaultBranches() {
-  ensureSheets();
-  const tab = sheet(SHEETS.branches);
-  if (tab.getLastRow() > 1) return;
-  Object.keys(BRANCH_SHEETS).forEach(branch => tab.appendRow([branch, new Date()]));
-  syncBranchSheets();
-}
 function deleteAllBranches() {
   ensureSheets();
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
@@ -165,11 +158,28 @@ function createBranchSheet(spreadsheet, branch) {
   const settings = BRANCH_SHEETS[branch] || branchSettings(branch);
   let tab = spreadsheet.getSheetByName(settings.tab);
   if (!tab) tab = spreadsheet.insertSheet(settings.tab);
+  positionBranchSheet(spreadsheet, tab);
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setValues([UNIT_HEADERS]);
   tab.setFrozenRows(1);
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setBackground(settings.header).setFontColor(settings.text).setFontWeight('bold');
   tab.getRange(1, 1, 1, UNIT_HEADERS.length).setHorizontalAlignment('center');
   tab.autoResizeColumns(1, UNIT_HEADERS.length);
+}
+function positionBranchSheet(spreadsheet, branchTab) {
+  const branchesSheet = spreadsheet.getSheetByName(SHEETS.branches);
+  if (!branchesSheet || branchTab.getName() === SHEETS.branches) return;
+  const branchRows = branchesSheet.getDataRange().getValues().slice(1);
+  const branchTabNames = new Set(branchRows.map(row => {
+    const branch = String(row[0]).trim();
+    return (BRANCH_SHEETS[branch] || branchSettings(branch)).tab;
+  }).filter(Boolean));
+  branchTabNames.add(branchTab.getName());
+  const managedTabs = spreadsheet.getSheets().filter(tab => branchTabNames.has(tab.getName()) && tab.getName() !== branchTab.getName());
+  const lastBranchIndex = Math.max(branchesSheet.getIndex(), ...managedTabs.map(tab => tab.getIndex()));
+  const targetPosition = lastBranchIndex + 1;
+  if (branchTab.getIndex() === targetPosition) return;
+  spreadsheet.setActiveSheet(branchTab);
+  spreadsheet.moveActiveSheet(targetPosition);
 }
 function branchSettings(branch) {
   const name = String(branch).trim();
