@@ -92,9 +92,18 @@ function createBranch(name) {
   });
   if (existing) throw new Error('Branch already exists and is active');
   branchesTab.appendRow([branchName, new Date()]);
-  createBranchSheet(getSpreadsheet(), branchName);
-  syncBranchSheets();
+  createBranchSheetSafely(getSpreadsheet(), branchName);
   return branchName;
+}
+function createBranchSheetSafely(spreadsheet, branch) {
+  const settings = BRANCH_SHEETS[branch] || branchSettings(branch);
+  let tab = spreadsheet.getSheetByName(settings.tab);
+  if (!tab) tab = spreadsheet.insertSheet(settings.tab);
+  tab.getRange(1, 1, 1, UNIT_HEADERS.length).setValues([UNIT_HEADERS]);
+  tab.setFrozenRows(1);
+  tab.getRange(1, 1, 1, UNIT_HEADERS.length).setBackground(settings.header).setFontColor(settings.text).setFontWeight('bold');
+  tab.setTabColor(settings.header);
+  return tab.getName();
 }
 function normalizeBranchName(name) {
   let branchName = String(name || '').trim().replace(/\s+/g, ' ');

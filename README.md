@@ -29,6 +29,8 @@ When using the Apps Script backend before creating your first permanent account,
 
 If the Apps Script log says `Service Spreadsheets failed while accessing document`, select `authorizeSpreadsheet` in Apps Script and click **Run**. Approve the requested Google permissions. The account running Apps Script must have Editor access to the spreadsheet. Then run `setupSpreadsheet` and redeploy the web app.
 
+Branch creation uses a minimal sheet-creation path to avoid heavy formatting calls during the request. After pasting the latest `gs/Code.gs`, create a new deployment version; the existing web app deployment will otherwise continue running the older branch-creation code.
+
 ### Spreadsheet access error
 
 If Apps Script reports that it cannot access spreadsheet ID `1kSpF64p6kyRRkEKrd5DrUjmHr1wkyNAkZTG-DlrBHeA`, open the spreadsheet while signed in to the same Google account that owns the Apps Script project. Make sure that account has Editor access to the sheet, run `setupSpreadsheet` once to complete authorization, and redeploy the web app with **Execute as: Me** and **Who has access: Anyone**. If the Apps Script owner is a different account, share the spreadsheet with that account before redeploying.
