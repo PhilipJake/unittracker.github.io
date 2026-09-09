@@ -82,7 +82,7 @@ function deleteAccount(username, user) {
   return username;
 }
 function createBranch(name) {
-  const branchName = String(name || '').trim();
+  const branchName = normalizeBranchName(name);
   if (!branchName) throw new Error('Branch name is required');
   const branchesTab = sheet(SHEETS.branches);
   const existing = branchesTab.getDataRange().getValues().slice(1).some(row => String(row[0]).trim().toLowerCase() === branchName.toLowerCase());
@@ -90,6 +90,12 @@ function createBranch(name) {
   branchesTab.appendRow([branchName, new Date()]);
   createBranchSheet(SpreadsheetApp.openById(SPREADSHEET_ID), branchName);
   syncBranchSheets();
+  return branchName;
+}
+function normalizeBranchName(name) {
+  const branchName = String(name || '').trim().replace(/\s+/g, ' ');
+  if (!branchName) throw new Error('Branch name is required');
+  if (/^(BNB|EZ|1LR)\b/i.test(branchName) && !/\bbranch$/i.test(branchName)) return branchName + ' branch';
   return branchName;
 }
 function deleteUnit(unitCode) {
