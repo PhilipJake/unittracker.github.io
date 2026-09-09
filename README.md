@@ -16,13 +16,14 @@ When using the Apps Script backend before creating your first permanent account,
 
 ## Connect Google Sheets
 
-1. In the supplied spreadsheet, create sheets named `Accounts`, `Units`, and `Branches`.
+1. In the supplied spreadsheet, create sheets named `Accounts`, `Units`, and `Branches`. The current Apps Script also creates these tabs automatically if they are missing.
 2. Add these header rows:
    - `Accounts`: `name`, `username`, `password`, `role`, `branch`, `status`
    - `Units`: `Unit Code`, `Client Name`, `Model`, `Processor`, `RAM`, `Storage Size (HDD/SSD/SD)`, `Unit Price`, `Status`, `Current Location`, `Date Received`, `Released Date`
    - `Branches`: `name`, `created`
 3. Open **Extensions > Apps Script**, paste in `gs/Code.gs`, and deploy it as a web app. Set access to the people who should use the tracker.
 4. Put the deployed web app URL into `API_URL` at the top of `js/app.js`.
+5. In Apps Script, select `setupSpreadsheet` from the function menu and click **Run** once. This creates the six branch tabs and applies the header color scheme. Branch tabs are also synchronized automatically when units are created, edited, or deleted.
 
 For production, replace the plain-text password column with salted password hashes and move login to a proper identity provider. Google Apps Script is suitable for a small internal tool, but it should not be treated as a high-security identity system.
 
