@@ -82,9 +82,15 @@ function deleteAccount(username, user) {
   return username;
 }
 function createBranch(name) {
-  sheet(SHEETS.branches).appendRow([name, new Date()]);
-  createBranchSheet(SpreadsheetApp.openById(SPREADSHEET_ID), name);
-  return name;
+  const branchName = String(name || '').trim();
+  if (!branchName) throw new Error('Branch name is required');
+  const branchesTab = sheet(SHEETS.branches);
+  const existing = branchesTab.getDataRange().getValues().slice(1).some(row => String(row[0]).trim().toLowerCase() === branchName.toLowerCase());
+  if (existing) throw new Error('Branch already exists');
+  branchesTab.appendRow([branchName, new Date()]);
+  createBranchSheet(SpreadsheetApp.openById(SPREADSHEET_ID), branchName);
+  syncBranchSheets();
+  return branchName;
 }
 function deleteUnit(unitCode) {
   const tab = sheet(SHEETS.units);
@@ -98,10 +104,14 @@ function deleteUnit(unitCode) {
 function deleteBranch(name) {
   const tab = sheet(SHEETS.branches);
   const values = tab.getDataRange().getValues();
-  const rowIndex = values.findIndex((row, index) => index > 0 && String(row[0]) === String(name));
+  const branchName = String(name || '').trim();
+  const rowIndex = values.findIndex((row, index) => index > 0 && String(row[0]).trim().toLowerCase() === branchName.toLowerCase());
   if (rowIndex < 1) throw new Error('Branch not found');
   tab.deleteRow(rowIndex + 1);
-  return name;
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const branchTab = spreadsheet.getSheetByName((BRANCH_SHEETS[branchName] || branchSettings(branchName)).tab);
+  if (branchTab) spreadsheet.deleteSheet(branchTab);
+  return branchName;
 }
 function adminLocations(user) { return [...new Set([user.branch, 'BNB Rosales branch', WAREHOUSE])]; }
 function authenticate(token) { const raw = CacheService.getScriptCache().get(token); return raw ? JSON.parse(raw) : null; }
@@ -118,8 +128,13 @@ function ensureSheets() {
     if (!tab) tab = spreadsheet.insertSheet(name);
     if (tab.getLastRow() === 0) tab.getRange(1, 1, 1, definitions[name].length).setValues([definitions[name]]);
   });
+  ensureDefaultBranches(spreadsheet.getSheetByName(SHEETS.branches));
   ensureTemporaryAccount(spreadsheet.getSheetByName(SHEETS.accounts));
   setupBranchSheets(spreadsheet);
+}
+function ensureDefaultBranches(tab) {
+  if (tab.getLastRow() > 1) return;
+  Object.keys(BRANCH_SHEETS).forEach(branch => tab.appendRow([branch, new Date()]));
 }
 function ensureTemporaryAccount(tab) {
   const rows = tab.getDataRange().getValues();
@@ -128,9 +143,8 @@ function ensureTemporaryAccount(tab) {
 }
 function setupSpreadsheet() { ensureSheets(); syncBranchSheets(); }
 function setupBranchSheets(spreadsheet) {
-  Object.keys(BRANCH_SHEETS).forEach(branch => {
-    createBranchSheet(spreadsheet, branch);
-  });
+  const branches = sheet(SHEETS.branches).getDataRange().getValues().slice(1).map(row => String(row[0]).trim()).filter(Boolean);
+  branches.forEach(branch => createBranchSheet(spreadsheet, branch));
 }
 function createBranchSheet(spreadsheet, branch) {
   const settings = BRANCH_SHEETS[branch] || branchSettings(branch);
