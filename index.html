@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="css/styles.css">
   <style>
     .action-buttons{display:inline-flex;align-items:center;gap:6px}
     .delete-button{width:30px;height:30px;padding:0;border:1px solid #f1c9c5;border-radius:6px;background:#fff0ee;color:#b94237;display:inline-grid;place-items:center;font-size:15px;line-height:1;transition:background .18s,color .18s,transform .18s}
@@ -72,6 +72,6 @@
 
   <div class="modal-backdrop hidden" id="unitModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="unitModalTitle"><button class="modal-close" data-close-modal="unitModal">×</button><p class="eyebrow">Unit registry</p><h2 id="unitModalTitle">Register a unit</h2><p class="modal-copy" id="unitModalCopy">Add a client unit to the shared tracking database.</p><form id="unitForm"><div class="form-grid"><label>Unit code<input name="unitCode" required placeholder="e.g. UF-1048"></label><label>Client name<input name="clientName" required placeholder="Client or company"></label><label>Model<input name="model" required placeholder="e.g. Dell Latitude 5420"></label><label>Processor<input name="processor" required placeholder="e.g. Intel Core i5"></label><label>RAM<input name="ram" required placeholder="e.g. 16 GB"></label><label>Storage size<input name="storage" required placeholder="e.g. 512 GB SSD"></label><label>Unit price<input name="unitPrice" type="number" min="0" step="0.01" required placeholder="e.g. 25000"></label><label>Current location<select name="currentLocation" id="unitBranch" required></select></label><label>Date received<input name="dateReceived" type="date" required></label><label>Released date<input name="releasedDate" type="date"></label><label>Status<select name="status" required><option>For observation</option><option>Released</option><option>For release</option><option>To be transfered</option><option>In warehouse</option></select></label></div><label>Notes<textarea name="notes" rows="3" placeholder="Optional unit notes"></textarea></label><div class="modal-actions"><button type="button" class="secondary-button" data-close-modal="unitModal">Cancel</button><button class="primary-button" type="submit" id="unitSubmitButton">Save unit</button></div></form></div></div>
   <div class="toast" id="toast" role="status"></div>
-  <script src="app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
