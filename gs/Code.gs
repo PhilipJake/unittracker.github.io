@@ -111,6 +111,7 @@ function deleteBranch(name) {
   const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
   const branchTab = spreadsheet.getSheetByName((BRANCH_SHEETS[branchName] || branchSettings(branchName)).tab);
   if (branchTab) spreadsheet.deleteSheet(branchTab);
+  cleanupOrphanBranchSheets();
   return branchName;
 }
 function adminLocations(user) { return [...new Set([user.branch, 'BNB Rosales branch', WAREHOUSE])]; }
@@ -128,13 +129,8 @@ function ensureSheets() {
     if (!tab) tab = spreadsheet.insertSheet(name);
     if (tab.getLastRow() === 0) tab.getRange(1, 1, 1, definitions[name].length).setValues([definitions[name]]);
   });
-  ensureDefaultBranches(spreadsheet.getSheetByName(SHEETS.branches));
   ensureTemporaryAccount(spreadsheet.getSheetByName(SHEETS.accounts));
   setupBranchSheets(spreadsheet);
-}
-function ensureDefaultBranches(tab) {
-  if (tab.getLastRow() > 1) return;
-  Object.keys(BRANCH_SHEETS).forEach(branch => tab.appendRow([branch, new Date()]));
 }
 function ensureTemporaryAccount(tab) {
   const rows = tab.getDataRange().getValues();
@@ -142,6 +138,13 @@ function ensureTemporaryAccount(tab) {
   if (!hasTemporaryAccount) tab.appendRow([TEMP_TECHNICIAN.name, TEMP_TECHNICIAN.username, TEMP_TECHNICIAN.password, TEMP_TECHNICIAN.role, TEMP_TECHNICIAN.branch, TEMP_TECHNICIAN.status]);
 }
 function setupSpreadsheet() { ensureSheets(); syncBranchSheets(); }
+function initializeDefaultBranches() {
+  ensureSheets();
+  const tab = sheet(SHEETS.branches);
+  if (tab.getLastRow() > 1) return;
+  Object.keys(BRANCH_SHEETS).forEach(branch => tab.appendRow([branch, new Date()]));
+  syncBranchSheets();
+}
 function setupBranchSheets(spreadsheet) {
   const branches = sheet(SHEETS.branches).getDataRange().getValues().slice(1).map(row => String(row[0]).trim()).filter(Boolean);
   branches.forEach(branch => createBranchSheet(spreadsheet, branch));
@@ -170,7 +173,7 @@ function syncBranchSheets() {
   const values = master.getDataRange().getValues();
   values.shift();
   const branchRows = sheet(SHEETS.branches).getDataRange().getValues().slice(1);
-  const branches = [...new Set([...Object.keys(BRANCH_SHEETS), ...branchRows.map(row => String(row[0]).trim()).filter(Boolean)])];
+  const branches = [...new Set(branchRows.map(row => String(row[0]).trim()).filter(Boolean))];
   branches.forEach(branch => {
     createBranchSheet(spreadsheet, branch);
     const settings = BRANCH_SHEETS[branch] || branchSettings(branch);
@@ -180,6 +183,18 @@ function syncBranchSheets() {
     if (rowCount) tab.getRange(2, 1, rowCount, UNIT_HEADERS.length).clearContent();
     if (rows.length) tab.getRange(2, 1, rows.length, UNIT_HEADERS.length).setValues(rows);
     tab.getRange(1, 1, 1, UNIT_HEADERS.length).setBackground(settings.header).setFontColor(settings.text).setFontWeight('bold');
+  });
+}
+function cleanupOrphanBranchSheets() {
+  const spreadsheet = SpreadsheetApp.openById(SPREADSHEET_ID);
+  const activeTabs = new Set(sheet(SHEETS.branches).getDataRange().getValues().slice(1).map(row => {
+    const branch = String(row[0]).trim();
+    return (BRANCH_SHEETS[branch] || branchSettings(branch)).tab;
+  }).filter(Boolean));
+  spreadsheet.getSheets().forEach(tab => {
+    if ([SHEETS.accounts, SHEETS.units, SHEETS.branches].includes(tab.getName())) return;
+    const header = tab.getRange(1, 1, 1, UNIT_HEADERS.length).getValues()[0];
+    if (header.join('|') === UNIT_HEADERS.join('|') && !activeTabs.has(tab.getName())) spreadsheet.deleteSheet(tab);
   });
 }
 function sheet(name) { return SpreadsheetApp.openById(SPREADSHEET_ID).getSheetByName(name); }
